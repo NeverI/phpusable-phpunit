@@ -1,8 +1,7 @@
 <?php
-namespace \PHPUsable;
+namespace PHPUsable;
 
 date_default_timezone_set('America/Denver');
-require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use \Esperance\Assertion;
 use \Esperance\Extension;
@@ -35,7 +34,7 @@ class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
      * the 'it' statements, and returns the TestSuite.
      **/
     static public function suite() {
-        $suite = new PHPUnit_Framework_TestSuite;
+        $suite = new \PHPUnit_Framework_TestSuite;
         $klass = get_called_class();
         $base_instance = new $klass;
         $base_instance->tests();
@@ -87,7 +86,7 @@ class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
      **/
     public function describe($title, $body) {
         if($this->_result === null) {
-            $this->_result = new PHPUnit_Framework_TestResult;
+            $this->_result = new \PHPUnit_Framework_TestResult;
         }
 
         array_push($this->_before_chain, null);
@@ -172,17 +171,17 @@ class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
      * This runs the actual test, and is intended to be run against the testsuite
      * that is output by the 'suite' function
      **/
-    public function run(PHPUnit_Framework_TestResult $result = NULL) {
+    public function run(\PHPUnit_Framework_TestResult $result = NULL) {
         if ($result === NULL) {
-            $result = new PHPUnit_Framework_TestResult;
+            $result = new \PHPUnit_Framework_TestResult;
         }
 
         $this->_result = $result;
         $this->_result->startTest($this);
 
-        PHPUnit_Framework_Assert::resetCount();
+        \PHPUnit_Framework_Assert::resetCount();
 
-        PHP_Timer::start();
+        \PHP_Timer::start();
         $stop_time = NULL;
 
         try {
@@ -204,7 +203,7 @@ class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
             }
         }
 
-        catch (PHPUnit_Framework_AssertionFailedError $e) {
+        catch (\PHPUnit_Framework_AssertionFailedError $e) {
             $stop_time = PHP_Timer::stop();
             $this->_result->addFailure($this, $e, $stop_time);
         }
@@ -215,10 +214,10 @@ class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
         }
 
         if ($stop_time === NULL) {
-            $stop_time = PHP_Timer::stop();
+            $stop_time = \PHP_Timer::stop();
         }
 
-        $this->addToAssertionCount(PHPUnit_Framework_Assert::getCount());
+        $this->addToAssertionCount(\PHPUnit_Framework_Assert::getCount());
 
         $this->_result->endTest($this, $stop_time);
 
