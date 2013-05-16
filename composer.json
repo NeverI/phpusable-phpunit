@@ -1,0 +1,7 @@
+{
+    "name": "benzittlau/phpusable",
+    "require": {
+        "esperance/esperance": "dev-master",
+        "phpunit/phpunit": "3.7.*"
+    }
+}

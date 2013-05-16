@@ -1,0 +1,9 @@
+*.swp
+phpa-norl.php
+ipn_errors.log
+.buildpath
+.project
+.settings
+.phakesession
+.clisession*
+tags
