@@ -3,6 +3,6 @@
     "keywords": ["bdd", "tdd", "assertion"],
     "license": "MIT",
     "require": {
-        "esperance/esperance": "dev-master"
+        "esperance/esperance": ">=0.1.*"
     }
 }
