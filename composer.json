@@ -1,6 +1,8 @@
 {
     "name": "mover-io/phpusable-phpunit",
+    "keywords": ["bdd", "tdd", "assertion"],
+    "license": "MIT",
     "require": {
-        "esperance/esperance": "dev-master"
+        "evenement/evenement": "1.*"
     }
 }
