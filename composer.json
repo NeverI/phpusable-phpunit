@@ -1,5 +1,5 @@
 {
-    "name": "benzittlau/phpusable",
+    "name": "mover-io/phpusable-phpunit",
     "require": {
         "esperance/esperance": "dev-master",
         "phpunit/phpunit": "3.7.*"
