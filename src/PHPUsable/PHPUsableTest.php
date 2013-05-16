@@ -257,22 +257,22 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
 }
 
 function describe() {
-    return PHPUsable_test::run_on_current_test('describe', func_get_args());
+    return PHPUsableTest::run_on_current_test('describe', func_get_args());
 }
 
 function setup() {
-    return PHPUsable_test::run_on_current_test('setup', func_get_args());
+    return PHPUsableTest::run_on_current_test('setup', func_get_args());
 }
 
 function teardown() {
-    return PHPUsable_test::run_on_current_test('teardown', func_get_args());
+    return PHPUsableTest::run_on_current_test('teardown', func_get_args());
 }
 
 function it() {
-    return PHPUsable_test::run_on_current_test('it', func_get_args());
+    return PHPUsableTest::run_on_current_test('it', func_get_args());
 }
 
 function before() {
-    return PHPUsable_test::run_on_current_test('before', func_get_args());
+    return PHPUsableTest::run_on_current_test('before', func_get_args());
 }
 
