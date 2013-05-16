@@ -3,6 +3,7 @@
     "keywords": ["bdd", "tdd", "assertion"],
     "license": "MIT",
     "require": {
+        "phpunit/phpunit": "3.7.*",
         "esperance/esperance": ">=0.1"
     }
     "autoload": {
