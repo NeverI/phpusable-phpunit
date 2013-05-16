@@ -7,6 +7,6 @@
         "esperance/esperance": ">=0.1"
     },
     "autoload": {
-        "psr-0": { "PHPUsable": "src" }
+        "psr-0": { "PHPUsable\\": "src" }
     }
 }
