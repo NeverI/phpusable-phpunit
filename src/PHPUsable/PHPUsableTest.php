@@ -6,7 +6,7 @@ date_default_timezone_set('America/Denver');
 use \Esperance\Assertion;
 use \Esperance\Extension;
 
-class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
+class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     protected $_args = array();
     protected $_result = null;
     protected $_assertion_count = null;
@@ -25,7 +25,7 @@ class PHPUsable_Test extends \PHPUnit_Framework_TestCase {
      * aliases (e.g. 'describe') more DRY.
      **/
     static public function run_on_current_test($method_name, $arguments) {
-        return call_user_func_array(array(PHPUsable_Test::$current_test, $method_name), $arguments);
+        return call_user_func_array(array(PHPUsableTest::$current_test, $method_name), $arguments);
     }
 
     /**
