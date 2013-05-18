@@ -27,6 +27,42 @@ $ php composer.phar install
 
 Then PHPUsable will be installed in `./vendor` directory and also `./vendor/autoload.php` is generated.
 
+## Usage
+PHPUsable is (almost) fully PHPUnit compatible.  To run a PHPUsable test file, simply run it using phpunit.
+
+``` bash
+$ phpunit test/test.php
+PHPUnit 3.7.20 by Sebastian Bergmann.
+
+....
+
+Time: 0 seconds, Memory: 4.50Mb
+
+OK (4 tests, 4 assertions)
+```
+
+It even supports phpunit debug output.
+
+``` bash
+$ phpunit --debug test/test.php
+PHPUnit 3.7.20 by Sebastian Bergmann.
+
+
+Starting test 'with esperance style assertions::with a true value::should be true'.
+.
+Starting test 'with esperance style assertions::with a false value::should be false'.
+.
+Starting test 'with phpunit style assertions::with a true value::should be true'.
+.
+Starting test 'with phpunit style assertions::with a false value::should be false'.
+.
+
+Time: 0 seconds, Memory: 4.50Mb
+
+OK (4 tests, 4 assertions)
+```
+
+
 ## Usage Example
 
 ``` php
