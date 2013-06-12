@@ -6,6 +6,7 @@ date_default_timezone_set('America/Denver');
 use \Esperance\Assertion;
 use \Esperance\Extension;
 
+
 class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     protected $_args = array();
     protected $_result = null;
@@ -62,9 +63,22 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             throw new Exception( " Method " . $method_name . " not exist in this class " . get_class( $this ) . "." );
         }
          */
-            throw new Exception( " Method " . $method_name . " not exist in this class " . get_class( $this ) . "." );
+            throw new \Exception( " Method " . $method_name . " not exist in this class " . get_class( $this ) . "." );
     }
 
+    /** This is a shim so that we can use the PHPUnit Test Case RunTest
+     * method to execute our own tests.  See the PHPUnit TestCase source
+     * lines 963
+     *  try {
+     *      $class  = new ReflectionClass($this);
+     *      $method = $class->getMethod($this->name);
+     *  }
+     *
+     *
+     */
+    public function run_current_test() {
+        return call_user_func($this->_current_test, $this);
+    }
     /**
      * Plumbing to connect up esperance to give us an expectation syntax for
      * the assertions in our tests.
@@ -195,7 +209,14 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
                     call_user_func($current_before, $this);
                 }
             }
-            call_user_func($this->_current_test, $this);
+
+            // Part of the shim to allow us to use PHPUnit's runTest method
+            $refClass= new \ReflectionClass( $this);
+            $refProperty = $refClass->getParentClass()->getParentClass()->getProperty( 'name' );
+            $refProperty->setAccessible(true);
+            $refProperty->setValue($this, 'run_current_test');
+
+            $this->runTest();
 
             //Run the after callbacks
             if($this->_teardown_callback !== null) {
@@ -204,12 +225,12 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         }
 
         catch (\PHPUnit_Framework_AssertionFailedError $e) {
-            $stop_time = PHP_Timer::stop();
+            $stop_time = \PHP_Timer::stop();
             $this->_result->addFailure($this, $e, $stop_time);
         }
 
         catch (Exception $e) {
-            $stop_time = PHP_Timer::stop();
+            $stop_time = \PHP_Timer::stop();
             $this->_result->addError($this, $e, $stop_time);
         }
 

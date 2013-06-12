@@ -6,4 +6,6 @@ ipn_errors.log
 .settings
 .phakesession
 .clisession*
+composer.lock
 tags
+vendor/*
