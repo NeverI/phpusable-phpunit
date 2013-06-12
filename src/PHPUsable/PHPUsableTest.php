@@ -217,6 +217,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $refProperty->setValue($this, 'run_current_test');
 
             $this->runTest();
+            $this->verifyMockObjects();
 
             //Run the after callbacks
             if($this->_teardown_callback !== null) {
