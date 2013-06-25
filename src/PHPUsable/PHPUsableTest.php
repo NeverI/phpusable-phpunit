@@ -212,7 +212,13 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
 
             // Part of the shim to allow us to use PHPUnit's runTest method
             $refClass= new \ReflectionClass( $this);
-            $refProperty = $refClass->getParentClass()->getParentClass()->getProperty( 'name' );
+            for($i = 0; $i < 20; $i++) {
+                $refClass = $refClass->getParentClass();
+                if($refClass->getName() === 'PHPUnit_Framework_TestCase') {
+                    break;
+                }
+            }
+            $refProperty = $refClass->getProperty( 'name' );
             $refProperty->setAccessible(true);
             $refProperty->setValue($this, 'run_current_test');
 
