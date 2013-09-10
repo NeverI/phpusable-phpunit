@@ -153,6 +153,19 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @see PHPUnit/Framework/TestCase.php for the original implementation.
+     * We're overriding it so we can use our _current_test_name variable in
+     * place of `name'.
+     */
+    public function getName($withDataSet = TRUE) {
+        if ($withDataSet) {
+            return $this->_current_test_name . $this->getDataSetAsString(FALSE);
+        } else {
+            return $this->_current_test_name;
+        }
+    }
+
+    /**
      * This is a magic setter method which allows us to define arbitrary attrbitutes
      * on the test itself so we can pass variables between before blocks and the 
      * tests themselves (instance variables are used for this in rspec).
