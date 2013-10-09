@@ -1,9 +1,7 @@
 <?php
 namespace PHPUsable;
 
-date_default_timezone_set('America/Denver');
-
-use \Esperance\Assertion;
+guse \Esperance\Assertion;
 use \Esperance\Extension;
 
 
