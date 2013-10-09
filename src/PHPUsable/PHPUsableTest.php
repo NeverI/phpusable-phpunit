@@ -1,7 +1,7 @@
 <?php
 namespace PHPUsable;
 
-guse \Esperance\Assertion;
+use \Esperance\Assertion;
 use \Esperance\Extension;
 
 
