@@ -234,6 +234,11 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $this->_result->addFailure($this, $e, $stop_time);
         }
 
+        catch (\Esperance\Error $e) {
+            $stop_time = \PHP_Timer::stop();
+            $this->_result->addFailure($this, new \PHPUnit_Framework_AssertionFailedError($e->getMessage(), $e->getCode(), $e), $stop_time);
+        }
+
         catch (Exception $e) {
             $stop_time = \PHP_Timer::stop();
             $this->_result->addError($this, $e, $stop_time);
