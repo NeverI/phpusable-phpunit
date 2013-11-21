@@ -15,6 +15,8 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     protected $_describe_title_chain = array();
     protected $_current_test_name = "Unknown test";
 
+    private $_shadow_mocks = array();
+
     protected static $test_suite = array();
     public static $current_test = null;
 
@@ -284,6 +286,56 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     public function getNumAssertions()
     {
         return $this->assertion_count;
+    }
+
+    /**
+     * Returns a mock object for the specified class.
+     *
+     * @param  string  $original_class_name
+     * @param  array   $methods
+     * @param  array   $arguments
+     * @param  string  $mock_class_name
+     * @param  boolean $call_original_constructor
+     * @param  boolean $call_original_clone
+     * @param  boolean $call_autoload
+     * @param  boolean $clone_arguments
+     * @return PHPUnit_Framework_MockObject_MockObject
+     * @throws PHPUnit_Framework_Exception
+     * @since  Method available since Release 3.0.0
+     */
+    public function getMock($original_class_name, $methods = array(), array $arguments = array(), $mock_class_name = '', $call_original_constructor = TRUE, $call_original_clone = TRUE, $call_autoload = TRUE, $clone_arguments = FALSE)
+    {
+        $mock_object = parent::getMock(
+          $original_class_name,
+          $methods,
+          $arguments,
+          $mock_class_name,
+          $call_original_constructor,
+          $call_original_clone,
+          $call_autoload,
+          $clone_arguments
+        );
+
+        $this->_shadow_mocks[] = $mock_object;
+
+        return $mock_object;
+    }
+
+    /**
+     * Verifies the mock object expectations.
+     *
+     * @since Method available since Release 3.5.0
+     */
+    protected function verifyMockObjects()
+    {
+        foreach ($this->_shadow_mocks as $mock_object) {
+            if ($mock_object->__phpunit_hasMatchers()) {
+                $this->assertion_count++;
+            }
+        }
+        $this->_shadow_mocks = array();
+
+        parent::verifyMockObjects();
     }
 }
 
