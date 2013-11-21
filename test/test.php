@@ -76,5 +76,37 @@ class PHPTest extends PHPUsableTest {
                 throw new \Exception();
             });
         });
+
+        describe('disabled specs', function($test) {
+            it ('should not fatal, whitout test body');
+
+            xit ('should not error out whit xit', function($test){
+               throw new \Exception();
+            });
+
+            describe('entry describe without body');
+
+            xdescribe('entry describe with x', function($test){
+                it('should not error out whit xit', function($test){
+                   throw new \Exception();
+                });
+
+                describe('inner describe', function($test){
+                    it('should be also disabled', function($test){
+                        throw new \Exception();
+                    });
+                });
+            });
+
+            it('should not stack on disabled state', function($test){
+                $test->assertTrue(true);
+            });
+        });
+
+        describe('should use when mehod', function($test){
+            when('there are several case with the same result', function($test){
+                $test->assertTrue(true);
+            });
+        });
     }
 }
