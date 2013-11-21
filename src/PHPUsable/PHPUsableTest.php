@@ -13,6 +13,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     protected $_setup_callback = null;
     protected $_teardown_callback = null;
     protected $_describe_title_chain = array();
+    protected $_describe_chain_is_disabled = false;
     protected $_current_test_name = "Unknown test";
 
     protected static $test_suite = array();
@@ -96,7 +97,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     /**
      * The nested context dsl command to create a new level of context.
      **/
-    public function describe($title, $body) {
+    public function describe($title, $body = null) {
         if($this->_result === null) {
             $this->_result = new \PHPUnit_Framework_TestResult;
         }
@@ -104,10 +105,23 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         array_push($this->_before_chain, null);
         array_push($this->_describe_title_chain, $title);
 
-        call_user_func($body, $this);
+        if ($body == null) {
+            $this->it('not implemented');
+        } else {
+            call_user_func($body, $this);
+        }
 
         array_pop($this->_before_chain);
         array_pop($this->_describe_title_chain);
+
+        if ($this->_describe_chain_is_disabled) {
+            $this->_describe_chain_is_disabled = false;
+        }
+    }
+
+    public function xdescribe($title, $body = null) {
+        $this->_describe_chain_is_disabled = true;
+        $this->describe($title, $body);
     }
 
     /**
@@ -138,8 +152,16 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     /**
      * The nested context dsl command to create a test.
      **/
-    public function it($title, $current_test) {
-        //clear the local args
+    public function it($title, $current_test = null) {
+        if ($current_test == null || $this->_describe_chain_is_disabled) {
+            $current_test = function($test){
+                $test->markTestIncomplete('This spec is not implemented yet.');
+            };
+        }
+        $this->createIt($title, $current_test);
+    }
+
+    protected function createIt($title, $current_test) {
         $this->_args = array();
 
         $describe_string = implode('::', $this->_describe_title_chain);
@@ -148,6 +170,13 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
 
         $clone = clone $this;
         self::$test_suite[] = $clone;
+    }
+
+    public function xit($title, $current_test = null) {
+        $current_test = function($test){
+            $test->markTestIncomplete('This spec is disabled by user');
+        };
+        $this->createIt($title, $current_test);
     }
 
     /**
@@ -291,6 +320,10 @@ function describe() {
     return PHPUsableTest::run_on_current_test('describe', func_get_args());
 }
 
+function xdescribe() {
+    return PHPUsableTest::run_on_current_test('xdescribe', func_get_args());
+}
+
 function setup() {
     return PHPUsableTest::run_on_current_test('setup', func_get_args());
 }
@@ -301,6 +334,10 @@ function teardown() {
 
 function it() {
     return PHPUsableTest::run_on_current_test('it', func_get_args());
+}
+
+function xit() {
+    return PHPUsableTest::run_on_current_test('xit', func_get_args());
 }
 
 function before() {
