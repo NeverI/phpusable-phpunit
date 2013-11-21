@@ -102,5 +102,11 @@ class PHPTest extends PHPUsableTest {
                 $test->assertTrue(true);
             });
         });
+
+        describe('should use when mehod', function($test){
+            when('there are several case with the same result', function($test){
+                $test->assertTrue(true);
+            });
+        });
     }
 }

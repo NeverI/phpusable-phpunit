@@ -179,6 +179,14 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         $this->createIt($title, $current_test);
     }
 
+    public function when($title, $current_test = null) {
+        $this->it('when ' . $title, $current_test);
+    }
+
+    public function xwhen($title, $current_test = null) {
+        $this->xit('when ' . $title, $current_test);
+    }
+
     /**
      * This is a magic setter method which allows us to define arbitrary attrbitutes
      * on the test itself so we can pass variables between before blocks and the 
@@ -338,6 +346,14 @@ function it() {
 
 function xit() {
     return PHPUsableTest::run_on_current_test('xit', func_get_args());
+}
+
+function when() {
+    return PHPUsableTest::run_on_current_test('when', func_get_args());
+}
+
+function xwhen() {
+    return PHPUsableTest::run_on_current_test('xwhen', func_get_args());
 }
 
 function before() {
