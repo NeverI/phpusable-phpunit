@@ -14,6 +14,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     protected $_teardown_callback = null;
     protected $_describe_title_chain = array();
     protected $_describe_chain_is_disabled = false;
+    protected $_describe_chain_disabled_index = -1;
     protected $_current_test_name = "Unknown test";
 
     private $_shadow_mocks = array();
@@ -116,13 +117,14 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         array_pop($this->_before_chain);
         array_pop($this->_describe_title_chain);
 
-        if ($this->_describe_chain_is_disabled) {
+        if ($this->_describe_chain_is_disabled && $this->_describe_chain_disabled_index == count($this->_describe_title_chain)) {
             $this->_describe_chain_is_disabled = false;
         }
     }
 
     public function xdescribe($title, $body = null) {
         $this->_describe_chain_is_disabled = true;
+        $this->_describe_chain_disabled_index = count($this->_describe_title_chain);
         $this->describe($title, $body);
     }
 

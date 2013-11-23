@@ -96,6 +96,12 @@ class PHPTest extends PHPUsableTest {
                         throw new \Exception();
                     });
                 });
+
+                describe('multiple inner describe', function($test){
+                    it('should be also disabled', function($test){
+                        throw new \Exception();
+                    });
+                });
             });
 
             it('should not stack on disabled state', function($test){
