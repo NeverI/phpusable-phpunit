@@ -264,6 +264,12 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $this->runTest();
             $this->verifyMockObjects();
 
+            $this->addToAssertionCount(\PHPUnit_Framework_Assert::getCount());
+
+            if (!$this->assertion_count) {
+                $this->markTestIncomplete('This spec does not has any expectation.');
+            }
+
             //Run the after callbacks
             if($this->_teardown_callback !== null) {
                 call_user_func($this->_teardown_callback, $this);
@@ -288,8 +294,6 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         if ($stop_time === NULL) {
             $stop_time = \PHP_Timer::stop();
         }
-
-        $this->addToAssertionCount(\PHPUnit_Framework_Assert::getCount());
 
         $this->_result->endTest($this, $stop_time);
 

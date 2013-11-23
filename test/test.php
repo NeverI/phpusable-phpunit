@@ -107,6 +107,10 @@ class PHPTest extends PHPUsableTest {
             it('should not stack on disabled state', function($test){
                 $test->assertTrue(true);
             });
+
+            it('should also mark incomplete when not has any expectation', function($test){
+
+            });
         });
 
         describe('should use when mehod', function($test){
