@@ -78,16 +78,16 @@ class PHPTest extends PHPUsableTest {
         });
 
         describe('disabled specs', function($test) {
-            it ('should not fatal, whitout test body');
+            it ('should not get fatal, without test body');
 
-            xit ('should not error out whit xit', function($test){
+            xit ('should not error out with xit', function($test){
                throw new \Exception();
             });
 
             describe('entry describe without body');
 
             xdescribe('entry describe with x', function($test){
-                it('should not error out whit xit', function($test){
+                it('should not error out with it', function($test){
                    throw new \Exception();
                 });
 
@@ -108,12 +108,12 @@ class PHPTest extends PHPUsableTest {
                 $test->assertTrue(true);
             });
 
-            it('should also mark incomplete when not has any expectation', function($test){
+            it('should also mark incomplete when it does not have any expectation', function($test){
 
             });
         });
 
-        describe('should use when mehod', function($test){
+        describe('should use when method', function($test){
             when('there are several case with the same result', function($test){
                 $test->assertTrue(true);
             });
