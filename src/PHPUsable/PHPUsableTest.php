@@ -159,7 +159,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     public function it($title, $current_test = null) {
         if ($current_test == null || $this->_describe_chain_is_disabled) {
             $current_test = function($test){
-                $test->markTestIncomplete('This spec is not implemented yet.');
+                $test->markTestIncomplete('This spec is not implemented yet');
             };
         }
         $this->createIt($title, $current_test);
@@ -267,7 +267,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $this->addToAssertionCount(\PHPUnit_Framework_Assert::getCount());
 
             if (!$this->assertion_count) {
-                $this->markTestIncomplete('This spec does not has any expectation.');
+                $this->markTestIncomplete('This spec does not have any expectation');
             }
 
             //Run the after callbacks
