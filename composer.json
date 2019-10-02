@@ -1,5 +1,5 @@
 {
-    "name": "mover-io/phpusable-phpunit",
+    "name": "neveri/phpusable-phpunit",
     "keywords": ["bdd", "tdd", "assertion"],
     "license": "MIT",
     "require": {
