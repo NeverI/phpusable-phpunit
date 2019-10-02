@@ -13,7 +13,11 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     protected $_setup_callback = null;
     protected $_teardown_callback = null;
     protected $_describe_title_chain = array();
+    protected $_describe_chain_is_disabled = false;
+    protected $_describe_chain_disabled_index = -1;
     protected $_current_test_name = "Unknown test";
+
+    private $_shadow_mocks = array();
 
     protected static $test_suite = array();
     public static $current_test = null;
@@ -36,6 +40,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         $suite = new \PHPUnit_Framework_TestSuite;
         $klass = get_called_class();
         $base_instance = new $klass;
+        $base_instance->setUp();
         $base_instance->tests();
 
         $test_array = self::$test_suite;
@@ -96,7 +101,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     /**
      * The nested context dsl command to create a new level of context.
      **/
-    public function describe($title, $body) {
+    public function describe($title, $body = null) {
         if($this->_result === null) {
             $this->_result = new \PHPUnit_Framework_TestResult;
         }
@@ -104,10 +109,24 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         array_push($this->_before_chain, null);
         array_push($this->_describe_title_chain, $title);
 
-        call_user_func($body, $this);
+        if ($body == null) {
+            $this->it('not implemented');
+        } else {
+            call_user_func($body, $this);
+        }
 
         array_pop($this->_before_chain);
         array_pop($this->_describe_title_chain);
+
+        if ($this->_describe_chain_is_disabled && $this->_describe_chain_disabled_index == count($this->_describe_title_chain)) {
+            $this->_describe_chain_is_disabled = false;
+        }
+    }
+
+    public function xdescribe($title, $body = null) {
+        $this->_describe_chain_is_disabled = true;
+        $this->_describe_chain_disabled_index = count($this->_describe_title_chain);
+        $this->describe($title, $body);
     }
 
     /**
@@ -123,7 +142,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
      * This will stick a callback on the front of the before
      * chain permanently.
      **/
-    public function setup($callback) {
+    public function _setup($callback) {
         $this->_setup_callback = $callback;
     }
 
@@ -131,15 +150,23 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
      * This will stick a callback on the front of the before
      * chain permanently.
      **/
-    public function teardown($callback) {
+    public function _teardown($callback) {
         $this->_teardown_callback = $callback;
     }
 
     /**
      * The nested context dsl command to create a test.
      **/
-    public function it($title, $current_test) {
-        //clear the local args
+    public function it($title, $current_test = null) {
+        if ($current_test == null || $this->_describe_chain_is_disabled) {
+            $current_test = function($test){
+                $test->markTestIncomplete('This spec is not implemented yet');
+            };
+        }
+        $this->createIt($title, $current_test);
+    }
+
+    protected function createIt($title, $current_test) {
         $this->_args = array();
 
         $describe_string = implode('::', $this->_describe_title_chain);
@@ -150,9 +177,37 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
         self::$test_suite[] = $clone;
     }
 
+    public function xit($title, $current_test = null) {
+        $current_test = function($test){
+            $test->markTestIncomplete('This spec is disabled by user');
+        };
+        $this->createIt($title, $current_test);
+    }
+
+    public function when($title, $current_test = null) {
+        $this->it('when ' . $title, $current_test);
+    }
+
+    public function xwhen($title, $current_test = null) {
+        $this->xit('when ' . $title, $current_test);
+    }
+
+    /**
+     * @see PHPUnit/Framework/TestCase.php for the original implementation.
+     * We're overriding it so we can use our _current_test_name variable in
+     * place of `name'.
+     */
+    public function getName($withDataSet = TRUE) {
+        if ($withDataSet) {
+            return $this->_current_test_name . $this->getDataSetAsString(FALSE);
+        } else {
+            return $this->_current_test_name;
+        }
+    }
+
     /**
      * This is a magic setter method which allows us to define arbitrary attrbitutes
-     * on the test itself so we can pass variables between before blocks and the 
+     * on the test itself so we can pass variables between before blocks and the
      * tests themselves (instance variables are used for this in rspec).
      *
      * @example $test->key_value_store = new $test->hash_class($test->initial_values);
@@ -163,7 +218,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * This is a magic getter method which allows us to retrieve arbitrary attrbitutes
-     * on the test itself so we can pass variables between before blocks and the 
+     * on the test itself so we can pass variables between before blocks and the
      * tests themselves (instance variables are used for this in rspec).
      **/
     public function __get($name) {
@@ -223,6 +278,12 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $this->runTest();
             $this->verifyMockObjects();
 
+            $this->addToAssertionCount(\PHPUnit_Framework_Assert::getCount());
+
+            if (!$this->assertion_count) {
+                $this->markTestIncomplete('This spec does not have any expectation');
+            }
+
             //Run the after callbacks
             if($this->_teardown_callback !== null) {
                 call_user_func($this->_teardown_callback, $this);
@@ -239,7 +300,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $this->_result->addFailure($this, new \PHPUnit_Framework_AssertionFailedError($e->getMessage(), $e->getCode(), $e), $stop_time);
         }
 
-        catch (Exception $e) {
+        catch (\Exception $e) {
             $stop_time = \PHP_Timer::stop();
             $this->_result->addError($this, $e, $stop_time);
         }
@@ -248,8 +309,6 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
             $stop_time = \PHP_Timer::stop();
         }
 
-        $this->addToAssertionCount(\PHPUnit_Framework_Assert::getCount());
-
         $this->_result->endTest($this, $stop_time);
 
         return $this->_result;
@@ -257,7 +316,7 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * This is called by the TestUI printer to give a name for the test
-     * in the debug output as well as in the failure output in the 
+     * in the debug output as well as in the failure output in the
      * footer of the test output.
      **/
     public function toString() {
@@ -285,22 +344,96 @@ class PHPUsableTest extends \PHPUnit_Framework_TestCase {
     {
         return $this->assertion_count;
     }
+
+    /**
+     * Returns a mock object for the specified class.
+     *
+     * @param  string  $original_class_name
+     * @param  array   $methods
+     * @param  array   $arguments
+     * @param  string  $mock_class_name
+     * @param  boolean $call_original_constructor
+     * @param  boolean $call_original_clone
+     * @param  boolean $call_autoload
+     * @param  boolean $clone_arguments
+     * @return PHPUnit_Framework_MockObject_MockObject
+     * @throws PHPUnit_Framework_Exception
+     * @since  Method available since Release 3.0.0
+     */
+    public function getMock($original_class_name, $methods = array(), array $arguments = array(), $mock_class_name = '', $call_original_constructor = TRUE, $call_original_clone = TRUE, $call_autoload = TRUE, $clone_arguments = FALSE)
+    {
+        $mock_object = parent::getMock(
+          $original_class_name,
+          $methods,
+          $arguments,
+          $mock_class_name,
+          $call_original_constructor,
+          $call_original_clone,
+          $call_autoload,
+          $clone_arguments
+        );
+
+        $this->_shadow_mocks[] = $mock_object;
+
+        return $mock_object;
+    }
+
+    /**
+     * Verifies the mock object expectations.
+     *
+     * @since Method available since Release 3.5.0
+     */
+    protected function verifyMockObjects()
+    {
+        foreach ($this->_shadow_mocks as $mock_object) {
+            if ($mock_object->__phpunit_hasMatchers()) {
+                $this->assertion_count++;
+            }
+        }
+        $this->_shadow_mocks = array();
+
+        parent::verifyMockObjects();
+    }
+
+    /**
+     * Default implementation that should be overriden by every test
+     */
+    public function tests()
+    {
+    }
+
 }
 
 function describe() {
     return PHPUsableTest::run_on_current_test('describe', func_get_args());
 }
 
+function xdescribe() {
+    return PHPUsableTest::run_on_current_test('xdescribe', func_get_args());
+}
+
 function setup() {
-    return PHPUsableTest::run_on_current_test('setup', func_get_args());
+    return PHPUsableTest::run_on_current_test('_setup', func_get_args());
 }
 
 function teardown() {
-    return PHPUsableTest::run_on_current_test('teardown', func_get_args());
+    return PHPUsableTest::run_on_current_test('_teardown', func_get_args());
 }
 
 function it() {
     return PHPUsableTest::run_on_current_test('it', func_get_args());
+}
+
+function xit() {
+    return PHPUsableTest::run_on_current_test('xit', func_get_args());
+}
+
+function when() {
+    return PHPUsableTest::run_on_current_test('when', func_get_args());
+}
+
+function xwhen() {
+    return PHPUsableTest::run_on_current_test('xwhen', func_get_args());
 }
 
 function before() {
